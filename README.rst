@@ -25,7 +25,7 @@ Installation
 ------------
 .. code:: bash
 
-  git clone https://github.com/maneyko/class.git
+  git clone https://github.com/maneyko/partID.git
   mkdir images
   mv img/path/{image_name}.{jpg,png} images/
 
@@ -34,7 +34,7 @@ To run
 ------
 .. code:: bash
 
-  ./main.py ./images/{image_name}.{jpg,png}
+  python2 partID/main.py ./images/{image_name}.{jpg,png}
 
 
 Output
