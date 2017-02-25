@@ -177,11 +177,66 @@ def rects_before_square(rects, diff=0.1):
 def main(img):
     plots = []
 
-    # Threshold image and combine largest bounding rectangles.
-    can = thresh_image(img, gaus=True)
-    cont_can, conts = max_contours(can, largest=40)
-    rects = np.asarray(map(cv2.boundingRect, conts))
-    rect_pts = np.asarray([ [(x,y), (x+w,y+h)] for x, y, w, h in rects ])
+    """
+    Create B&W processed image
+    --------------------------
+    """
+
+    # http://docs.opencv.org/3.0-last-rst/modules/imgproc/doc/miscellaneous_transformations.html#cvtcolor
+    gray = cv2.cvtColor(img, code=cv2.COLOR_BGR2GRAY)
+
+    # http://docs.opencv.org/3.0-last-rst/doc/py_tutorials/py_imgproc/py_histograms/py_histogram_equalization/py_histogram_equalization.html#clahe-contrast-limited-adaptive-histogram-equalization
+    blur = cv2.GaussianBlur(gray, ksize=(5, 5), sigmaX=0)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    cl1 = clahe.apply(blur)
+
+    thresh = cv2.adaptiveThreshold(cl1, maxValue=255,
+                                   adaptiveMethod=cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                   thresholdType=cv2.THRESH_BINARY_INV,
+                                   blockSize=101, C=2)
+
+    """
+    Find Contours
+    -------------
+    * Find `n` largest contours on image
+    * Redraw contours on a blank image
+    * Keep `largest` largest contours of image
+    """
+    largest = 10
+
+    # http://docs.opencv.org/3.0-last-rst/modules/imgproc/doc/structural_analysis_and_shape_descriptors.html#findcontours
+    _, thresh_contours, hierarchy = \
+            cv2.findContours(thresh, mode=cv2.RETR_TREE,
+                             method=cv2.CHAIN_APPROX_SIMPLE)
+
+    # http://docs.opencv.org/3.0-last-rst/modules/imgproc/doc/drawing_functions.html#drawcontours
+    cv2.drawContours(thresh,
+                     contours=thresh_contours,
+                     contourIdx=-1,
+                     color=255,
+                     thickness=4)
+
+    thresh_blank = np.zeros(thresh.shape)
+    # http://docs.opencv.org/3.0-last-rst/modules/imgproc/doc/structural_analysis_and_shape_descriptors.html#approxpolydp
+    contours = np.asarray([cv2.approxPolyDP(cont, epsilon=3, closed=True)
+                           for cont in thresh_contours])
+    areas = np.asarray(map(cv2.contourArea, contours))
+    top_areas = areas.argsort()[-largest:]
+    top_conts = contours[top_areas]
+    for cont in top_conts:
+        cv2.drawContours(thresh_blank, contours=[cont], contourIdx=0,
+                         color=255, thickness=3, maxLevel=0)
+
+    """
+    Rectangles
+    ----------
+    * Create bounding rectangle on all contours
+    * Obtain coordinates of each rectangle
+    * Combine all overlapping rectangles
+    """
+
+    rects = np.asarray(map(cv2.boundingRect, top_conts))
+    rect_pts = np.asarray([[(x, y), (x + w, y + h)] for x, y, w, h in rects])
     combined_rects = combine_rects(rect_pts, miss=10)
 
     plot_cont = cont_can.copy()
@@ -210,9 +265,9 @@ def main(img):
 
     # Find rotation angle of part then rotate image
     r255, c255 = np.where(part_can > 0)
-    pts255 = np.vstack((r255+top, c255+left))
+    pts255 = np.vstack((r255 + top, c255 + left))
     rcenter, (rwidth, rheight), angle = modAreaRect(pts255.T)
-    box = cv2.boxPoints((rcenter, (rwidth,rheight), angle))
+    box = cv2.boxPoints((rcenter, (rwidth, rheight), angle))
     plot_cont = cont_can.copy()
     cv2.drawContours(plot_cont, contours=[np.int0(box)], contourIdx=0,
                      color=255, thickness=5)
