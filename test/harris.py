@@ -52,4 +52,3 @@ filename = filename[len(filename) - 1]
 
 out = 'harris_' + filename
 cv2.imwrite(out, img)
-

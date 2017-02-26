@@ -14,7 +14,7 @@ def move_forward(data, lower, upper, move, min_len=1):
     inc = 0
     while inc + move < data.size:
         forward = data[inc : inc + move]
-        between, _ = np.where((lower < forward) & (forward < upper))
+        between = np.where((lower < forward) & (forward < upper))[0]
         if between.size > min_len - 1:
             inc += move
         else:
@@ -112,42 +112,27 @@ def thresh_image(img, blur_size=5, canlow=50, canhigh=100, threshold=-1,
         return cv2.Canny(ret_equ, threshold1=canlow, threshold2=canhigh)
     return can
 
-def tplot(fig, name='', lines='', pts=False, clear=True,
-          lim=0, llim=0, img=False, output=True):
-    """Helper function for making fast plots
 
-    Parameters
-    ----------
-    fig : array_like
-        Data to plot
-    name : str
-        Value to append to `tplot.outfile`
+def max_contours(thresh, largest=10):
     """
-    if hasattr(tplot, 'name'):
-        base = os.path.basename(tplot.name)
-        tplot.outfile = base[:base.find('.')]  # Basename without extension
-    else:
-        return
-    if output:
-        if not os.path.exists('output/'):
-            os.mkdir('output/')
-        write = 'output/{}{}.jpg'.format(tplot.outfile, name)
-    if img:
-        cv2.imwrite(write, fig)
-        return
-    if lines and lim < 0:
-        return
-    if lines:
-        clear = False
-        if lines == 'v':
-            plt.plot([fig, fig], [llim, lim])
-        elif lines == 'h':
-            plt.plot([llim, lim], [fig, fig])
-    elif pts:
-        plt.scatter(range(len(fig)), fig)
-    else:
-        plt.plot(range(len(fig)), fig)
-    if clear:
-        plt.savefig(write)
-        plt.clf()
-        plt.cla()
+    Takes `largest` contours of an image, then draws them on a new
+    image.
+    """
+    _, thresh_contours, hierarchy = \
+            cv2.findContours(thresh, mode=cv2.RETR_TREE,
+                             method=cv2.CHAIN_APPROX_SIMPLE)
+    cv2.drawContours(thresh,
+                     contours=thresh_contours,
+                     contourIdx=-1,
+                     color=255,
+                     thickness=4)
+    thresh_blank = np.zeros(thresh.shape)
+    contours = np.asarray([cv2.approxPolyDP(cont, epsilon=3, closed=True)
+                           for cont in thresh_contours])
+    areas = np.asarray(map(cv2.contourArea, contours))
+    top_areas = areas.argsort()[-largest:]
+    top_conts = contours[top_areas]
+    for cont in top_conts:
+        cv2.drawContours(thresh_blank, contours=[cont], contourIdx=0,
+                         color=255, thickness=3, maxLevel=0)
+    return thresh_blank, top_conts

@@ -21,23 +21,38 @@ Example
 .. |output| image:: ./figures/output.jpg
 
 
-Installation
-------------
-.. code:: bash
+Process
+-------
 
-  git clone https://github.com/maneyko/partID.git
-  mkdir images
-  mv img/path/{image_name}.{jpg,png} images/
++---------------------------------+----------+
+|  Identify all contours in image | |step_0| |
++---------------------------------+----------+
+| Combine overlapping contours    | |step_1| |
++---------------------------------+----------+
+| Select largest contour and      |          |
+| largest *square-like* contour   | |step_2| |
++---------------------------------+----------+
+| Realign image based on largest  |          |
+| contour angle                   | |step_3| |
++---------------------------------+----------+
+| Draw dimensions and output      |          |
+| calculations                    | |step_4| |
++---------------------------------+----------+
+
+.. |step_0| image:: ./output/00_0.jpg
+  :scale: 10 %
+.. |step_1| image:: ./output/00_1.jpg
+  :scale: 10 %
+.. |step_2| image:: ./output/00_2.jpg
+  :scale: 10 %
+.. |step_3| image:: ./output/00_3.jpg
+  :scale: 10 %
+.. |step_4| image:: ./output/00_4.jpg
+  :scale: 10 %
 
 
 To run
 ------
 .. code:: bash
 
-  python2 partID/main.py ./images/{image_name}.{jpg,png}
-
-
-Output
-------
-
-Output images will be in ``./output/``
+  python2 main.py ./figures/input.jpg
