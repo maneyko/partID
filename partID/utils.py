@@ -19,16 +19,40 @@ def modAreaRect(pts):
     return tuple(rcenter), tuple(np.intc([rwidth,rheight])), angle
 
 
-def rects_before_square(rects, diff=0.1):
+def max_contours(gray, largest=10):
     """
-    Returns a sorted array of rectangles up to and including a square.
+    Takes `largest` contours of an image, then draws them on the
+    returned image.
+
+    Parameters
+    ----------
+    gray : ndarray
+        Black and white image
+    largest : int
+        Number of largest contours to draw on reurned image
+
+    Returns
+    -------
+    contoured : ndarray
+        Image with `largest` contours drawn
+    top_conts : ndarray
+        Contours that have been drawn
     """
-    if rects.shape[0] == 1:
-        return rects
-    lens = np.diff(rects, axis=1).squeeze()
-    ratios = (lens[:, 0] / np.float_(lens[:, 1])).flatten()
-    asort_idx = np.prod(lens, axis=1).argsort(axis=0)
-    rsort = rects[asort_idx[::-1]]
-    ratios = ratios[asort_idx[::-1]]
-    q_ind = np.argmax((1-diff < ratios) & (ratios < 1+diff))
-    return rsort[:q_ind+1]
+    _, contours, hierarchy = \
+            cv2.findContours(gray, mode=cv2.RETR_TREE,
+                             method=cv2.CHAIN_APPROX_SIMPLE)
+
+    # **For demo**
+    cv2.drawContours(gray, contours=contours, contourIdx=-1,
+                     color=255, thickness=4)
+
+    contoured = np.zeros(gray.shape)
+    approx_curves = np.asarray([cv2.approxPolyDP(cont, epsilon=3, closed=True)
+                                for cont in contours])
+    areas = np.asarray([cv2.contourArea(c) for c in approx_curves])
+    top_areas = areas.argsort()[-largest:]
+    top_conts = approx_curves[top_areas]
+    for cont in top_conts:
+        cv2.drawContours(contoured, contours=[cont], contourIdx=0,
+                         color=255, thickness=3, maxLevel=0)
+    return contoured, top_conts

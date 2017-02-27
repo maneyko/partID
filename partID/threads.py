@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+"""
+Functions for working with threads of machine part
+"""
 
 import os
 
@@ -38,20 +40,20 @@ def find_threads(can, filter_dist=1):
     the median. The distance moved is used as the lower bound returned.
     """
     filt = filter_first(can, axis=1, dist=5)
-    lo = filt.size * 3 / 100
+    lo = filt.size * 3 // 100
     hi = lo * 6
     med = np.median(filt[lo:hi])
     before_med = np.where((med - 10 < filt) & (filt < med + 10))[0][0]
     tr_filt = filt[before_med:]
 
-    first_move = move = tr_filt.size / 25
+    first_move = move = tr_filt.size // 25
     spread = 0.05
     lower, upper = med * (1 - spread), med * (1 + spread)
     for _ in range(10):
         moved = move_forward(tr_filt, lower, upper, move)
         if moved.size > 2 * move:
             break
-        move += first_move / 2
+        move += first_move // 2
     bottom_cut = before_med + moved.size
     return before_med, bottom_cut
 
@@ -70,69 +72,11 @@ def thread_pts(threads_can):
         diffs = np.diff(peak)
         jumps = np.where(diffs > 1)[0] + 1
         hills = np.split(peak, jumps)
-        mdpts = np.intc(map(np.median, hills)).reshape(-1, 1)
+        mdpts = np.intc([np.median(h) for h in hills]).reshape(-1, 1)
         mdiffs = np.diff(mdpts, axis=0)
         too_big = np.where(mdiffs > np.median(mdiffs) * 3 / 2)[0]
         if too_big.size:
-            if too_big[0] > mdpts.size/2:
+            if too_big[0] > mdpts.size / 2:
                 mdpts = mdpts[:too_big[0]]
         peak_pts.append(np.hstack((threads[mdpts], mdpts)))
     return peak_pts
-
-def thresh_image(img, blur_size=5, canlow=50, canhigh=100, threshold=-1,
-                 equ=False, gaus=False):
-    """Custom thresholding function that performs different filters.
-
-    Parameters
-    ----------
-    img : array_like
-        Image as numpy array
-    blur_size : int
-        Applys `cv2.GaussianBlur` with
-    """
-    if len(img.shape) > 2:  # Accept a color image and a gray image
-        gray = cv2.cvtColor(img, code=cv2.COLOR_BGR2GRAY)
-    else:
-        gray = img
-    if threshold > 0:
-        return cv2.Canny(gray, threshold1=threshold, threshold2=threshold)
-    blur = cv2.GaussianBlur(gray, ksize=(blur_size, blur_size), sigmaX=0)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    ret_equ = clahe.apply(blur)
-    if equ:
-        return ret_equ
-    if gaus:
-        return cv2.adaptiveThreshold(ret_equ,
-                maxValue=255,
-                adaptiveMethod=cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                thresholdType=cv2.THRESH_BINARY_INV,
-                blockSize=101,
-                C=2)
-    else:
-        return cv2.Canny(ret_equ, threshold1=canlow, threshold2=canhigh)
-    return can
-
-
-def max_contours(thresh, largest=10):
-    """
-    Takes `largest` contours of an image, then draws them on a new
-    image.
-    """
-    _, thresh_contours, hierarchy = \
-            cv2.findContours(thresh, mode=cv2.RETR_TREE,
-                             method=cv2.CHAIN_APPROX_SIMPLE)
-    cv2.drawContours(thresh,
-                     contours=thresh_contours,
-                     contourIdx=-1,
-                     color=255,
-                     thickness=4)
-    thresh_blank = np.zeros(thresh.shape)
-    contours = np.asarray([cv2.approxPolyDP(cont, epsilon=3, closed=True)
-                           for cont in thresh_contours])
-    areas = np.asarray(map(cv2.contourArea, contours))
-    top_areas = areas.argsort()[-largest:]
-    top_conts = contours[top_areas]
-    for cont in top_conts:
-        cv2.drawContours(thresh_blank, contours=[cont], contourIdx=0,
-                         color=255, thickness=3, maxLevel=0)
-    return thresh_blank, top_conts

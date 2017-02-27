@@ -17,8 +17,10 @@ Example
 | |input|  | |output| |
 +----------+----------+
 
-.. |input| image:: ./figures/input.jpg
-.. |output| image:: ./figures/output.jpg
+.. |input| image:: figures/input.jpg
+  :scale: 15 %
+.. |output| image:: figures/output.jpg
+  :scale: 15 %
 
 
 Process
@@ -39,20 +41,20 @@ Process
 | calculations                    | |step_4| |
 +---------------------------------+----------+
 
-.. |step_0| image:: ./output/00_0.jpg
-  :scale: 10 %
-.. |step_1| image:: ./output/00_1.jpg
-  :scale: 10 %
-.. |step_2| image:: ./output/00_2.jpg
-  :scale: 10 %
-.. |step_3| image:: ./output/00_3.jpg
-  :scale: 10 %
-.. |step_4| image:: ./output/00_4.jpg
-  :scale: 10 %
+.. |step_0| image:: figures/output/input_0.jpg
+  :scale: 15 %
+.. |step_1| image:: figures/output/input_1.jpg
+  :scale: 15 %
+.. |step_2| image:: figures/output/input_2.jpg
+  :scale: 15 %
+.. |step_3| image:: figures/output/input_3.jpg
+  :scale: 15 %
+.. |step_4| image:: figures/output/input_4.jpg
+  :scale: 15 %
 
 
 To run
 ------
 .. code:: bash
 
-  python2 main.py ./figures/input.jpg
+  python2 main.py figures/input.jpg

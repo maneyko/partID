@@ -37,8 +37,13 @@ def combine_rects(rects, miss=0):
 
     If there is a difference of `miss` between any two points on two
     rectangles they are considered overlapping.
+
+    Parameters
+    ----------
+    rects : ndarray
+        Array that
     """
-    rects = np.asarray(map(minmax_pts, rects))
+    rects = np.asarray([minmax_pts(r) for r in rects])
     for _ in range(len(rects)):
         bool_joins = np.asarray([runion(rects[0], rect, miss=miss)
                                  for rect in rects])
@@ -50,3 +55,18 @@ def combine_rects(rects, miss=0):
         rects = rects[[nojoin]]
         rects = np.roll(rects, -1, 0)
     return rects
+
+
+def before_square(rects, diff=0.1):
+    """
+    Returns a sorted array of rectangles up to and including a square.
+    """
+    if rects.shape[0] == 1:
+        return rects
+    lens = np.diff(rects, axis=1).squeeze()
+    ratios = (lens[:, 0] / np.float_(lens[:, 1])).ravel()
+    asort_idx = np.prod(lens, axis=1).argsort(axis=0)
+    rsort = rects[asort_idx[::-1]]
+    ratios = ratios[asort_idx[::-1]]
+    q_ind = np.argmax((1 - diff < ratios) & (ratios < 1 + diff))
+    return rsort[:q_ind + 1]
