@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
+import sys
+import time
+
 import cv2
 import numpy as np
-from sys import argv
-import time
 
 def print_circles(img, circles):
     global outfile
     a, b, c = circles.shape
     for i in range(1):
         cv2.circle(img, (circles[0][i][0], circles[0][i][1]),
-                circles[0][i][2], (0, 0, 255), 3)
+                   circles[0][i][2], (0, 0, 255), 3)
         cv2.circle(img, (circles[0][i][0], circles[0][i][1]),
-                2, (0, 255, 0), 3)  # draw center of circle
+                   2, (0, 255, 0), 3)  # Draw center of circle
     cv2.imwrite('zcircles_' + outfile + '.jpg', img)
 
 def find_circles(img, radius, step, lower=-1):
@@ -20,9 +21,11 @@ def find_circles(img, radius, step, lower=-1):
         lower = step
     circles = None
     while circles is None and lower < radius:
-        circles = cv2.HoughCircles(img, cv2.cv.CV_HOUGH_GRADIENT, dp=1,
-                minDist=len(img)/2, circles=np.array([]), param1=100, param2=50,
-                minRadius=radius-step, maxRadius=radius)
+        circles = \
+            cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, dp=1,
+                             minDist=len(img) / 2, circles=np.array([]),
+                             param1=100, param2=50, minRadius=radius - step,
+                             maxRadius=radius)
         radius -= step
     return circles, radius+step
 
@@ -47,19 +50,17 @@ def find_quarter(filename):
     canny = theshold_image(gray)
     print np.mean(canny)
     cv2.imwrite( 'canny_' + outfile + '.jpg', canny)
-
     return 0
 
 
 if __name__ == '__main__':
     now = time.time()
-    for f in argv[1:]:
-        print f
+    for f in sys.argv[1:]:
+        print(f)
         try:
             radius = find_quarter(f)
         except AttributeError:
-            print 'ERROR'
+            print('ERROR')
             continue
-        print
-    print time.time() - now
+    print(time.time() - now)
 
