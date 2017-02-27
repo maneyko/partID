@@ -2,12 +2,9 @@
 Functions for working with threads of machine part
 """
 
-import os
-
-import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.signal import medfilt
+
 
 def move_forward(data, lower, upper, move, min_len=1):
     """
@@ -23,6 +20,7 @@ def move_forward(data, lower, upper, move, min_len=1):
             break
     return data[:inc]
 
+
 def filter_first(grid, axis=0, dist=1):
     """Returns first white pixel on a side of `grid`."""
     side = grid.argmax(axis)
@@ -30,6 +28,7 @@ def filter_first(grid, axis=0, dist=1):
         return np.intc(side)
     filt = medfilt(side, dist)
     return np.intc(filt)
+
 
 def find_threads(can, filter_dist=1):
     """Returns top portion of an image that is likely to be threads.
@@ -57,6 +56,7 @@ def find_threads(can, filter_dist=1):
     bottom_cut = before_med + moved.size
     return before_med, bottom_cut
 
+
 def thread_pts(threads_can):
     """Returns the thread coordinates (in px) of a canny image.
 
@@ -80,3 +80,19 @@ def thread_pts(threads_can):
                 mdpts = mdpts[:too_big[0]]
         peak_pts.append(np.hstack((threads[mdpts], mdpts)))
     return peak_pts
+
+
+def distances(part):
+    all_dists = []
+    for side in ['left', 'right']:
+        t_lo, t_hi = find_threads(part)
+        threads_can = part[t_lo:t_hi]
+        for peak, pts in zip(['max', 'min'], thread_pts(threads_can)):
+            if side == 'right':
+                pts[:, 0] = threads_can.shape[1] - pts[:, 0]
+            coord_diffs = np.diff(pts, axis=0)
+            pt_dists = np.linalg.norm(coord_diffs, axis=1)
+            all_dists = np.concatenate((all_dists, pt_dists))
+        if side == 'left':
+            part = np.fliplr(part)
+    return np.asarray(all_dists)

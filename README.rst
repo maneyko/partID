@@ -57,4 +57,4 @@ To run
 ------
 .. code:: bash
 
-  python2 main.py figures/input.jpg
+  python main.py figures/input.jpg
