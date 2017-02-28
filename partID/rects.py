@@ -41,7 +41,9 @@ def combine_rects(rects, miss=0):
     Parameters
     ----------
     rects : ndarray
-        Array that
+        Rectangles to combine
+    miss : int
+        Margin to consider adjacent rectangles overlapping
     """
     rects = np.asarray([minmax_pts(r) for r in rects])
     for _ in range(len(rects)):
@@ -57,16 +59,25 @@ def combine_rects(rects, miss=0):
     return rects
 
 
-def before_square(rects, diff=0.1):
-    """
-    Returns a sorted array of rectangles up to and including a square.
+def before_square(rects, ratio=0.1):
+    """Returns a sorted array of rectangles up to and including a square
+
+    Parameters
+    ----------
+    rects : ndarray
+        Rectangles to analyze
+    ratio : float
+        Square is identified as the rectangle that has side ratio
+        between `[1 - ratio, 1 + ratio]`
     """
     if rects.shape[0] == 1:
         return rects
     lens = np.diff(rects, axis=1).squeeze()
     ratios = (lens[:, 0] / np.float_(lens[:, 1])).ravel()
-    asort_idx = np.prod(lens, axis=1).argsort(axis=0)
-    rsort = rects[asort_idx[::-1]]
-    ratios = ratios[asort_idx[::-1]]
-    q_ind = np.argmax((1 - diff < ratios) & (ratios < 1 + diff))
-    return rsort[:q_ind + 1]
+    areas = np.prod(lens, axis=1)
+    area_idx = areas.argsort(axis=0)
+    sorted_rects = rects[area_idx[::-1]]
+    sorted_ratios = ratios[area_idx[::-1]]
+    quarter_idx = np.argmax((1 - ratio < sorted_ratios)
+                            & (sorted_ratios < 1 + ratio))
+    return sorted_rects[:quarter_idx + 1]

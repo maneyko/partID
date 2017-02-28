@@ -1,7 +1,7 @@
 """
 Contains main function -- majority of heavy lifting
 
-TODO
+TODO:
     Flat is better than nested...
 """
 
@@ -15,23 +15,20 @@ from . import thresholding
 from . import utils
 
 
-def plot_rectangles(gray, rects):
-    for rect in rects:
-        cv2.rectangle(gray, pt1=tuple(rect[0]), pt2=tuple(rect[1]),
-                      color=255, thickness=5)
-    return gray
-
-
 def get_shapes(img):
     thresh = thresholding.gaussian(img)
+    draw.save(thresh)
     contoured, contours = utils.max_contours(thresh, largest=40)
+    draw.save(contoured)
     bounding_rects = np.asarray([cv2.boundingRect(c) for c in contours])
     rect_pts = np.asarray([[(x, y), (x + w, y + h)]
                            for x, y, w, h in bounding_rects])
+    draw.save(draw.plot_rectangles(contoured.copy(), rect_pts))
     combined = rects.combine_rects(rect_pts, miss=10)
     sorted_rects = rects.before_square(combined)
     part_rect = sorted_rects[0]
     quarter_rect = sorted_rects[-1]
+    draw.save(draw.plot_rectangles(contoured.copy(), [part_rect, quarter_rect]))
     return contoured, part_rect, quarter_rect
 
 
@@ -60,36 +57,38 @@ def rotate(img, part, coords):
     M = cv2.getRotationMatrix2D(center, angle=angle + 90, scale=1)
     rotated_img = cv2.warpAffine(img, M, dsize=img.shape[::-1][:2])
 
-    loX, loY = center[0] - height // 2, center[1] - width // 2
-    hiX, hiY = center[0] + height // 2, center[1] + width // 2
-    rotated_part = rotated_img[loY:hiY, loX:hiX]
+    left, top = center[0] - height // 2, center[1] - width // 2
+    right, bottom = center[0] + height // 2, center[1] + width // 2
+    part_rect = np.asarray([[left, top], [right, bottom]])
 
-    return rotated_img, rotated_part
+    return rotated_img, part_rect
 
 
 def main(img):
-    plots = []
     contoured, part_rect, quarter_rect = get_shapes(img)
 
-    qcenter = quarter_rect.mean(0).round().astype(int)
-    qdiameter = np.diff(quarter_rect, axis=0).mean().round().astype(int)
+    quarter_diameter = np.diff(quarter_rect, axis=0).mean()
 
     left, top, right, bottom = part_rect.ravel()
-    part_cont = contoured[top:bottom, left:right]
+    part_contour = contoured[top:bottom, left:right]
 
-    rotated_img, part = rotate(contoured, part_cont, part_rect)
+    rotated_img, part_coords = rotate(contoured, part_contour, part_rect)
+    draw.save(draw.plot_rectangles(rotated_img.copy(), [part_coords]))
+    left, top, right, bottom = part_coords.ravel()
+    part = rotated_img[top:bottom, left:right]
+    draw.save(part)
 
     all_dists = threads.distances(part)
 
     IN_PER_QUARTER_DIAMETER = 0.955
-    px_per_in = qdiameter / IN_PER_QUARTER_DIAMETER
+    px_per_in = quarter_diameter / IN_PER_QUARTER_DIAMETER
     threads_per_in = px_per_in / np.median(all_dists)
     part_height, part_width = np.asarray(part.shape) / px_per_in
 
     output = {
-        'diameter': 'Diameter: {:d} px'.format(qdiameter),
+        'diameter': 'Diameter: {:.0f} px'.format(quarter_diameter),
         'thread': 'Thread: {:.0f} TPI'.format(threads_per_in),
         'height': 'Height: {:.2f} in'.format(part_height),
         'width': 'Width: {:.2f} in'.format(part_width),
     }
-    return output, plots
+    return output
