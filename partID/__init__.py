@@ -86,7 +86,7 @@ def main(img):
     part_height, part_width = np.asarray(part.shape) / px_per_in
 
     output = {
-        'diameter': 'Diameter: {:.0f} px'.format(quarter_diameter),
+        'diameter': 'Quarter Diameter: {:.0f} px'.format(quarter_diameter),
         'thread': 'Thread: {:.0f} TPI'.format(threads_per_in),
         'height': 'Height: {:.2f} in'.format(part_height),
         'width': 'Width: {:.2f} in'.format(part_width),

@@ -26,35 +26,15 @@ Example
 Process
 -------
 
-+---------------------------------+----------+
-|  Identify all contours in image | |step_0| |
-+---------------------------------+----------+
-| Combine overlapping contours    | |step_1| |
-+---------------------------------+----------+
-| Select largest contour and      |          |
-| largest *square-like* contour   | |step_2| |
-+---------------------------------+----------+
-| Realign image based on largest  |          |
-| contour angle                   | |step_3| |
-+---------------------------------+----------+
-| Draw dimensions and output      |          |
-| calculations                    | |step_4| |
-+---------------------------------+----------+
-
-.. |step_0| image:: figures/output/input_0.jpg
-  :scale: 15 %
-.. |step_1| image:: figures/output/input_1.jpg
-  :scale: 15 %
-.. |step_2| image:: figures/output/input_2.jpg
-  :scale: 15 %
-.. |step_3| image:: figures/output/input_3.jpg
-  :scale: 15 %
-.. |step_4| image:: figures/output/input_4.jpg
-  :scale: 15 %
+* Identify all contours in image
+* Combine overlapping contours
+* Select largest contour and largest *square-like* contour
+* Realign image based on largest contour angle
+* Draw dimensions and output calculations
 
 
 To run
 ------
 .. code:: bash
 
-  python main.py figures/input.jpg
+  ./main.py https://maneyko.com/partID/input.jpg

@@ -2,9 +2,9 @@
 
 import os
 import sys
-import time
 
 import cv2
+from six.moves.urllib.request import urlretrieve
 
 from partID import main
 
@@ -21,11 +21,14 @@ def write_img(img, filename, output_dir='output/'):
 for filename in files:
     print(filename)
 
-    img = cv2.imread(filename)
+    if filename.startswith('http'):
+        path, _ = urlretrieve(filename)
+        img = cv2.imread(path)
+        os.remove(path)
+    else:
+        img = cv2.imread(filename)
 
-    before_main = time.time()
     output = main(img)
-    print('Main: {:.3f}'.format(time.time() - before_main))
 
     for description in output.values():
         print(description)
