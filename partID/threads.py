@@ -27,7 +27,7 @@ def filter_first(grid, axis=0, dist=1):
     if dist < 2:
         return np.intc(side)
     filt = medfilt(side, dist)
-    return np.intc(filt)
+    return filt.astype(int)
 
 
 def find_threads(can, filter_dist=1):
@@ -57,13 +57,13 @@ def find_threads(can, filter_dist=1):
     return before_med, bottom_cut
 
 
-def thread_pts(threads_can):
+def thread_pts(grid):
     """Returns the thread coordinates (in px) of a canny image.
 
     It is assumed that the image is cut so that only to part is in
     the frame and that the threads are at the top of the image.
     """
-    threads = filter_first(threads_can, axis=1, dist=5)
+    threads = filter_first(grid, axis=1, dist=5)
     line = np.median(threads)
     above = np.where(threads < line)[0]
     below = np.where(threads > line)[0]
@@ -85,11 +85,11 @@ def thread_pts(threads_can):
 def distances(part):
     all_dists = []
     for side in ['left', 'right']:
-        t_lo, t_hi = find_threads(part)
-        threads_can = part[t_lo:t_hi]
-        for peak, pts in zip(['max', 'min'], thread_pts(threads_can)):
+        thread_lo, thread_hi = find_threads(part)
+        threads = part[thread_lo : thread_hi]
+        for peak, pts in zip(['max', 'min'], thread_pts(threads)):
             if side == 'right':
-                pts[:, 0] = threads_can.shape[1] - pts[:, 0]
+                pts[:, 0] = threads.shape[1] - pts[:, 0]
             coord_diffs = np.diff(pts, axis=0)
             pt_dists = np.linalg.norm(coord_diffs, axis=1)
             all_dists = np.concatenate((all_dists, pt_dists))

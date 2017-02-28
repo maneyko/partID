@@ -10,8 +10,8 @@ import numpy as np
 
 from . import draw
 from . import rects
-from . import thresholding
 from . import threads
+from . import thresholding
 from . import utils
 
 
@@ -20,6 +20,7 @@ def plot_rectangles(gray, rects):
         cv2.rectangle(gray, pt1=tuple(rect[0]), pt2=tuple(rect[1]),
                       color=255, thickness=5)
     return gray
+
 
 def get_shapes(img):
     thresh = thresholding.gaussian(img)
@@ -32,6 +33,7 @@ def get_shapes(img):
     part_rect = sorted_rects[0]
     quarter_rect = sorted_rects[-1]
     return contoured, part_rect, quarter_rect
+
 
 def rotate(img, part, coords):
     """
@@ -77,20 +79,7 @@ def main(img):
 
     rotated_img, part = rotate(contoured, part_cont, part_rect)
 
-    # ------------------------------------------------------------------------
-
-    all_dists = []
-    for side in ['left', 'right']:
-        t_lo, t_hi = threads.find_threads(part)
-        threads_can = part[t_lo:t_hi]
-        for peak, pts in zip(['max', 'min'], threads.thread_pts(threads_can)):
-            if side == 'right':
-                pts[:, 0] = threads_can.shape[1] - pts[:, 0]
-            coord_diffs = np.diff(pts, axis=0)
-            pt_dists = np.linalg.norm(coord_diffs, axis=1)
-            all_dists = np.concatenate((all_dists, pt_dists))
-        if side == 'left':
-            part = np.fliplr(part)
+    all_dists = threads.distances(part)
 
     IN_PER_QUARTER_DIAMETER = 0.955
     px_per_in = qdiameter / IN_PER_QUARTER_DIAMETER
@@ -103,6 +92,4 @@ def main(img):
         'height': 'Height: {:.2f} in'.format(part_height),
         'width': 'Width: {:.2f} in'.format(part_width),
     }
-    for value in output.values():
-        print(value)
     return output, plots
