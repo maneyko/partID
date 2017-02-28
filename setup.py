@@ -9,6 +9,9 @@ measured.
 
 from setuptools import setup
 
+with open('./requirements.txt') as f:
+    requirements = f.read().splitlines()
+
 setup(
     name='partID',
     author='Peter Maneykowski',
@@ -18,10 +21,5 @@ setup(
     description='Machine Part Image Identifier',
     long_description=__doc__,
     packages=['partID'],
-    install_requires=[
-        'numpy',
-        'scipy',
-        'matplotlib',
-        'six'
-    ]
+    install_requires=requirements
 )
