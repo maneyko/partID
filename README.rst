@@ -4,9 +4,10 @@ Machine Part Image Identifier
 About
 -----
 
-This is a miniature library to process images containing a quarter and a
-machine part. Once the part is located, various dimensions may be calculated.
-For now only the height, width, and thread pitch are measured.
+*partID* is a miniature library to process images containing a quarter
+and a machine part. Once the part is located, various dimensions may be
+calculated.  For now only the height, width, and thread pitch are
+measured.
 
 Example
 -------
@@ -37,4 +38,8 @@ To run
 ------
 .. code:: bash
 
+  # Standalone script
   ./main.py https://maneyko.com/partID/input.jpg
+
+  # Or as a module
+  python3 -m partID https://maneyko.com/partID/input.jpg
