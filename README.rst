@@ -1,13 +1,20 @@
-Machine Part Image Identifier
-=============================
+Machine Part Identifier
+=======================
+
 
 About
 -----
 
-**partID** is a miniature library to process images containing a quarter
-and a machine part. Once the part is located, various dimensions may be
-calculated. For now only the *height*, *width*, and *thread pitch* are
-measured.
+**partID** is a miniature library to get the *real dimensions* of an
+object from an image with a quarter. Various functions using OpenCV_
+are used for the extraction of the part and quarter from the image, then
+custom algorithms may be implemented to get certain features from the
+part. In this case an algorithm to calculate thread pitch was developed.
+For now the *height*, *width*, and *thread pitch* are measured to a mean
+accuracy of 90% tested on over 40 different images.
+
+.. _OpenCV: http://opencv.org/
+
 
 Example
 -------
