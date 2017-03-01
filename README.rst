@@ -6,7 +6,7 @@ About
 
 **partID** is a miniature library to process images containing a quarter
 and a machine part. Once the part is located, various dimensions may be
-calculated.  For now only the height, width, and thread pitch are
+calculated. For now only the *height*, *width*, and *thread pitch* are
 measured.
 
 Example
