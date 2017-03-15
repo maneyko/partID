@@ -14,8 +14,10 @@ accuracy of 90% tested on over 40 different images.
 
 from setuptools import setup
 
+
 with open('./requirements.txt') as f:
-    requirements = f.read().splitlines()
+    contents = f.read().splitlines()
+requirements = [line for line in contents if not line.startswith('#')]
 
 setup(
     name='partID',
