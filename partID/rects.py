@@ -1,5 +1,5 @@
 """
-Rectangle wrangling
+Rectangle wrangling.
 """
 
 import numpy as np
@@ -36,14 +36,19 @@ def combine_rects(rects, miss=0):
     """Joins all overlapping rectangles.
 
     If there is a difference of `miss` between any two points on two
-    rectangles they are considered overlapping.
+    rectangles they are considered overlapping. The rectangles should be
+    of the form `[[left, top], [right, bottom]]`::
+
+        >>> rects[0]
+        [[631 102]
+         [728 185]]
 
     Parameters
     ----------
     rects : ndarray
-        Rectangles to combine
+        Rectangles to combine.
     miss : int
-        Margin to consider adjacent rectangles overlapping
+        Margin to consider adjacent rectangles overlapping.
     """
     rects = np.asarray([minmax_pts(r) for r in rects])
     for _ in range(len(rects)):
@@ -60,15 +65,15 @@ def combine_rects(rects, miss=0):
 
 
 def before_square(rects, ratio=0.1):
-    """Returns a sorted array of rectangles up to and including a square
+    """Returns a sorted array of rectangles up to and including a square.
 
     Parameters
     ----------
     rects : ndarray
-        Rectangles to analyze
+        Rectangles to analyze.
     ratio : float
         Square is identified as the rectangle that has side ratio
-        between `[1 - ratio, 1 + ratio]`
+        between `[1 - ratio, 1 + ratio]`.
     """
     if rects.shape[0] == 1:
         return rects

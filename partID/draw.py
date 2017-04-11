@@ -1,5 +1,5 @@
 """
-Drawing and plotting functions
+Drawing and plotting functions.
 """
 
 import os
@@ -34,17 +34,17 @@ def diagram_line(img, lo, hi, width=10, end_len=50, color=0,
     Parameters
     ----------
     img : ndarray
-        Image on which to draw the line
+        Image on which to draw the line.
     lo : array_like
-        Coordinates on `img` of lower point
+        Coordinates on `img` of lower point.
     hi : array_like
-        Coordinates on `img` of higher point
+        Coordinates on `img` of higher point.
     width : int
-        Thickness of line
+        Thickness of line.
     end_len : int
-        Length (in pixels) of perpendicular mini-lines
+        Length (in pixels) of perpendicular mini-lines.
     color : int
-        Grayscale color of line
+        Grayscale color of line.
     horizontal : bool
     """
     if horizontal:

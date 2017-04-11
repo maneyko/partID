@@ -1,5 +1,5 @@
 """
-Thresholding functions
+Thresholding functions.
 """
 
 import cv2

@@ -1,5 +1,5 @@
 """
-Functions for working with threads of machine part
+Functions for working with threads of machine part.
 """
 
 import numpy as np
@@ -26,8 +26,7 @@ def filter_first(grid, axis=0, dist=1):
     side = grid.argmax(axis)
     if dist < 2:
         return np.intc(side)
-    filt = medfilt(side, dist)
-    return filt.astype(int)
+    return medfilt(side, dist).astype(int)
 
 
 def find_threads(can, filter_dist=1):
@@ -38,12 +37,12 @@ def find_threads(can, filter_dist=1):
     move forward on the image until there are no points that intersect
     the median. The distance moved is used as the lower bound returned.
     """
-    filt = filter_first(can, axis=1, dist=5)
+    filtered = filter_first(can, axis=1, dist=5)
     lo = filt.size * 3 // 100
     hi = lo * 6
     med = np.median(filt[lo:hi])
     before_med = np.where((med - 10 < filt) & (filt < med + 10))[0][0]
-    tr_filt = filt[before_med:]
+    tr_filt = filtered[before_med:]
 
     first_move = move = tr_filt.size // 25
     spread = 0.05
@@ -83,6 +82,7 @@ def thread_pts(grid):
 
 
 def distances(part):
+    """Returns distances (in pixels) between thread peaks and troughs."""
     all_dists = []
     for side in ['left', 'right']:
         thread_lo, thread_hi = find_threads(part)

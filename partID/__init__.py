@@ -1,8 +1,5 @@
 """
-Contains main function -- majority of heavy lifting
-
-TODO:
-    Flat is better than nested...
+Contains main function -- majority of heavy lifting.
 """
 
 import cv2
@@ -16,6 +13,10 @@ from . import utils
 
 
 def get_shapes(img):
+    """
+    Returns contoured version of `img`, bounding rectangle of the part,
+    and quarter.
+    """
     thresh = thresholding.gaussian(img)
     draw.save(thresh)
     contoured, contours = utils.max_contours(thresh, largest=40)
@@ -37,11 +38,11 @@ def rotate(img, part, coords):
     Parameters
     ----------
     img : ndarray
-        Image to rotate
+        Image to rotate.
     part : ndarray
-        Black and white part of image to rotate `img` about
+        Black and white part of image to rotate `img` about.
     coords : ndarray
-        Top left and bottom right coordinates of `shape`
+        Top left and bottom right coordinates of `shape`.
 
     Returns
     -------
@@ -65,6 +66,17 @@ def rotate(img, part, coords):
 
 
 def main(img):
+    """
+    Main function that performs all analysis on `img`.
+
+    Steps
+    -----
+    * Create contoured image.
+    * Locate bounding rectangles for part and quarter.
+    * Rotate image about the part.
+    * Locate threads in upper portion of image.
+    * Calculate distances between peaks and troughs of threads.
+    """
     contoured, part_rect, quarter_rect = get_shapes(img)
 
     quarter_diameter = np.diff(quarter_rect, axis=0).mean()

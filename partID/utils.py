@@ -1,14 +1,15 @@
 """
-Helper functions
+General utility functions.
 """
 
 import numpy as np
 import cv2
 
+
 def modAreaRect(pts):
     """Fixes angle orientation issues with `cv2.minAreaRect.`
 
-    Has same API as `cv2.minAreaRect`
+    Has same API as `cv2.minAreaRect`.
     """
     rcenter, (rwidth, rheight), angle = cv2.minAreaRect(pts)
     rcenter = np.intc(rcenter[::-1])  # Change to row, column order
@@ -27,16 +28,16 @@ def max_contours(gray, largest=10):
     Parameters
     ----------
     gray : ndarray
-        Black and white image
+        Black and white image.
     largest : int
-        Number of largest contours to draw on reurned image
+        Number of largest contours to draw on reurned image.
 
     Returns
     -------
     contoured : ndarray
-        Image with `largest` contours drawn
+        Image with `largest` contours drawn.
     top_conts : ndarray
-        Contours that have been drawn
+        Contours that have been drawn.
     """
     _, contours, hierarchy = \
             cv2.findContours(gray, mode=cv2.RETR_TREE,
