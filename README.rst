@@ -42,19 +42,19 @@ Process
 * Draw dimensions and output calculations
 
 +-----------+-----------+
-| |gauss|   | |conts|   |
+| |step0|   | |step1|   |
 +-----------+-----------+
-| |overlap| | |largest| |
-+-----------+-----------+
-| |align|   | |draw|    |
+| |step2|   | |step3|   |
 +-----------+-----------+
 
-.. |gauss| image::   https://maneyko.com/partID/output/00_0.jpg
-.. |conts| image::   https://maneyko.com/partID/output/00_1.jpg
-.. |overlap| image:: https://maneyko.com/partID/output/00_2.jpg
-.. |largest| image:: https://maneyko.com/partID/output/00_3.jpg
-.. |align| image::   https://maneyko.com/partID/output/00_4.jpg
-.. |draw| image::    https://maneyko.com/partID/output/00_5.jpg
+.. |step0| image::   figures/step_0.jpg
+  :scale: 15 %
+.. |step1| image::   figures/step_1.jpg
+  :scale: 15 %
+.. |step2| image::   figures/step_2.jpg
+  :scale: 15 %
+.. |step3| image::   figures/step_3.jpg
+  :scale: 15 %
 
 
 To run
