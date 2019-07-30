@@ -62,7 +62,7 @@ To run
 .. code:: bash
 
   # Standalone script
-  ./main.py https://maneyko.com/partID/input.jpg
+  ./main.py figures/00.jpg
 
   # Or as a module
-  python3 -m partID https://maneyko.com/partID/input.jpg
+  python3 -m partID figures/00.jpg
